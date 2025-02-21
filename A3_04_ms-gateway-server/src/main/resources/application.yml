@@ -1,0 +1,30 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: ms-products
+        uri: lb://ms-products
+        predicates:
+        - Path=/api/products/**
+        #- Header=token, \d+
+        #- Header=token, 12345
+        #- Method=GET,  POST
+        #- Query=color, verde
+        #- Cookie=color, azul
+        filters:
+        - StripPrefix=2
+        - name: SampleCookie
+          args:
+            message: hola mi mensaje personalizado para productos!
+            name: user
+            value: axel
+      - id: ms-items
+        uri: lb://ms-items
+        predicates:
+        - Path=/api/items/**
+        filters:
+        - StripPrefix=2
+        - AddRequestHeader=token-request, aghsa7s65d67ad6s6s7d7
+        - AddResponseHeader=token-response, 9zx9z9xz9xz9x9z9x9zx
+        - AddRequestParameter=name, axel
+        - SetResponseHeader=Content-Type, textplain
