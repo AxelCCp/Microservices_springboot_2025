@@ -38,6 +38,22 @@ public class ItemServiceFeign implements ItemService{
     }
 
 
+    @Override
+    public Product save(Product product) {
+      return this.productFeign.create(product);
+    }
+
+    @Override
+    public Product update(Product product, Long id) {
+      return this.productFeign.update(product, id);
+    }
+
+    @Override
+    public void delete(Long id) {
+      this.productFeign.delete(id);
+    }
+
+
     @Autowired
     private ProductFeign productFeign;
 
