@@ -1,0 +1,79 @@
+resilience4j:
+  circuitbreaker:
+    configs:
+      defecto:
+        sliding-window-size: 6
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        permitted-number-of-calls-in-half-open-state: 4
+        slow-call-duration-threshold: 3s
+        slow-call-rate-threshold: 50
+    instances:
+      products:
+        base-config: defecto
+  timelimiter:
+    configs:
+      defecto:
+        timeout-duration: 3s
+    instances:
+      products:
+        base-config: defecto      
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://127.0.0.1:9100
+      client:
+        registration:
+          client-app:
+            provider: spring
+            client-id: gateway-app
+            client-secret: 12345
+            authorization-grant-type: authorization_code
+            redirect-uri: http://127.0.0.1:8090/authorized
+            scope:
+            - openid
+            - profile
+            client-name: client-app
+        provider:
+          spring:
+            issuer-uri: http://127.0.0.1:9100      
+  cloud:
+    gateway:
+     mvc:
+      routes:
+      - id: ms-oauth2
+        uri: lb://ms-oauth2
+        predicates:
+        - Path=/api/security/**
+        filters:
+        - StripPrefix=2
+      - id: ms-users
+        uri: lb://ms-users
+        predicates:
+        - Path=/api/users/**
+        filters:
+        - StripPrefix=2
+      # EN LA CLASE DEL MAIN, SE CONFIGURA DE MANERA PROGRAMATICA,  YA QUE AL ESTAR GATEWAY CON MVC,  NO FUNCIONA EL CIRCUIT BREAKER.  
+      #- id: ms-products
+      #  uri: lb://ms-products
+      #  predicates:
+      #  - Path=/api/products/**
+      #  filters:
+      #  - name: CircuitBreaker
+      #    args:
+      #      name: products
+      #      statusCodes: 500
+      #      fallbackUri: forward:/api/items/5
+      #  - StripPrefix=2
+      - id: ms-items
+        uri: lb://ms-items
+        predicates:
+        - Path=/api/items/**
+        filters:
+        - StripPrefix=2
+        - AddRequestHeader=token-request, aghsa7s65d67ad6s6s7d7
+        - AddResponseHeader=token-response, 9zx9z9xz9xz9x9z9x9zx
+        - AddRequestParameter=name, axel
+        - SetResponseHeader=Content-Type, textplain
