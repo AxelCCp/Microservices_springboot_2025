@@ -1,0 +1,46 @@
+services:
+  ms-eureka-server:
+    container_name: ms-eureka-server
+    image: 4xe1/ms-eureka-2025:latest
+    ports:
+      - "8761:8761"
+    restart: always
+    networks:
+      - springcloud
+  mysql8:
+    container_name: mysql8 
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    restart: always
+    networks:
+      - springcloud
+    environment:
+      - MYSQL_ROOT_PASSWORD=sasa
+      - MYSQL_DATABASE=db_microservices_spring_cloud_2024
+  ms-products-server:
+    #container_name: ms-products-server
+    image: 4xe1/ms-products-2025:latest
+    deploy: 
+      replicas: 3
+    restart: always
+    networks:
+      - springcloud
+    depends_on:
+      - ms-eureka-server
+      - mysql8
+  ms-items-server:
+    container_name: ms-items-server 
+    image: 4xe1/ms-items-2025:latest
+    ports:
+      - "8005:8005"
+    restart: always
+    networks:
+      - springcloud
+    depends_on:
+      - ms-eureka-server
+      - ms-products-server
+ 
+  
+networks:
+  springcloud:    

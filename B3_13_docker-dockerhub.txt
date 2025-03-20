@@ -1,0 +1,75 @@
+
+SE REALIZAN MODIFICACIONES EN POM Y PROPERTIES DE PRODUCTOS E ITEMS
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+GENERA NUEVOS JAR DEL ITEMS Y PRODUCTOS
+
+	EN SUS RESPECTIVAS RUTAS:
+	
+	./mvnw.cmd clean package -DskipTests
+	
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	
+SE GENERAN REPOSITORIOS EN DOCKERHUB
+
+SE GENERAN IMAGENES PARA SUBIR A DOCKERHUB
+
+	PS C:\Users\Fanta\Documents\C6_MICROSERVICIOS_SPRING_2024\B3_13_ms-items> docker build -t 4xe1/ms-items-2025 .
+
+	docker build -t 4xe1/ms-items-2025 .
+	
+	PS C:\Users\Fanta\Documents\C6_MICROSERVICIOS_SPRING_2024\B3_13_ms-products> docker build -t 4xe1/ms-products-2025 .
+	
+	docker build -t 4xe1/ms-products-2025 .
+		
+	--------------------
+
+	A PARTIR DE LA IMAGEN QUE YA SE TIENE DE EUREKA, SE CREA UNA NUEVA IMAGEN PARA DOCKERHUB
+	
+	{ ms-eurekaserver } : el nombre de la imagen que se tiene.
+	
+	docker tag ms-eurekaserver:v1 4xe1/ms-eureka-2025
+	
+-------------------------
+
+
+SE SUBEN LAS IMAGENES A DOCKERHUB:
+
+	docker push 4xe1/ms-eureka-2025
+	
+	docker push 4xe1/ms-items-2025
+	
+	docker push 4xe1/ms-products-2025
+	
+	
+	
+PARA DESCARGAR LAS IMAGENES DESDE DOCKERHUB
+
+docker pull 4xe1/ms-products-2025:latest
+
+docker pull 4xe1/ms-items-2025:latest
+
+docker pull 4xe1/ms-eureka-2025:latest
+
+
+----------------------------
+
+
+
+RUN CONTENEDORES CON DOCKER RUN COMMAND:
+
+
+docker run -p 8761:8761 --name ms-eureka-server --network springcloud 4xe1/ms-eureka-2025:latest
+
+docker run -p 8005:8005 --name ms-items-server --network springcloud 4xe1/ms-items-2025:latest
+
+docker run -P --name ms-products-server --network springcloud 4xe1/ms-products-2025:latest
+
+
+SE TIENE QUE VOLVER A GENERAR EL CONTENEDOR DE MYSQL8, YA QUE SE ELIMINÓ EL QUE SE CREÓ CON DOCKER COMPOSE,  YA QUE EL DE
+COMPOSE USA UNA RED sprincloud-compose , MIENTRAS QUE ESTOS CONTENEDORES USAN LA RED springcloud.
+
+
+docker run -p 3307:3306 --network springcloud -e MYSQL_ROOT_PASSWORD=sasa -e MYSQL_DATABASE=db_microservices_spring_cloud_2024 --name mysql8 mysql:8.0
+

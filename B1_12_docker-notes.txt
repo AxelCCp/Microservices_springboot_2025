@@ -1,0 +1,180 @@
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+ms-configserver
+
+#CONSTRUYE JAR
+# PS C:\Users\Fanta\Documents\C6_MICROSERVICIOS_SPRING_2024\B1_12_ms-configserver> ./mvnw.cmd clean package
+
+#LUEGO TU DOCKERFILE
+
+#LUEGO GENERA IMAGEN:
+# PS C:\Users\Fanta\Documents\C6_MICROSERVICIOS_SPRING_2024\B1_12_ms-configserver> docker build -t ms-configserver:v1 . 
+
+-------------------------------------------------
+
+CREA LA NETWORK
+
+docker network create springcloud
+
+
+-------------------------------------------------
+
+DESPLIEGA ms-config-server
+
+docker run -p 8888:8888 --name ms-config-server --network springcloud ms-configserver:v1
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+EUREKA
+
+GENERA JAR
+
+./mvnw.cmd clean package
+
+
+
+GENERA IMAGEN
+
+docker build -t ms-eurekaserver:v1 .
+
+
+RUN CONTENEDOR
+
+docker run -p 8761:8761 --name ms-eureka-server --network springcloud ms-eurekaserver:v1
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CONTENEDOR MYSQL
+
+
+DESCARGA LA IMAGEN
+
+docker pull mysql:8.4.3	
+
+docker run -p 3307:3306 --network springcloud -e MYSQL_ROOT_PASSWORD=sasa -e MYSQL_DATABASE=db_microservices_spring_cloud_2024 --name mysql8 mysql:8.4.3
+
+docker run -p 3307:3306 --network springcloud -e MYSQL_ROOT_PASSWORD=sasa -e MYSQL_DATABASE=db_microservices_spring_cloud_2024 --name mysql8 mysql:8.0
+                                                 
+
+LUEGO EN WORKBENCH HAY Q CREAR NUEVA CONEXION
+
+connection name : docker
+port : 3307
+passwords : sasa
+
+
+***SE REALIZAN CONFIGURACIONES EN EL NUEVO AMBIENTE DE WORKBENCH.  VER VIDEOS. 
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CONTENEDOR PARA ZIPKIN
+
+
+IMAGEN DE ZIPKIN:
+
+
+desde la carpeta de zipkin:
+
+Fanta@MSI MINGW64 ~/Documents/C6_MICROSERVICIOS_SPRING_2024/B1_12_zipkin 
+
+docker build -t ms-zipkinserver .
+
+
+
+CONTENEDOR
+
+
+docker run -p 9411:9411 --name ms-zipkin-server --network springcloud -e STORAGE_TYPE=mysql -e MYSQL_USER=zipkin -e MYSQL_PASS=sasa -e MYSQL_HOST=mysql8 ms-zipkinserver:latest
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+SE GENERA JAR DE MS-PRODUCTS
+
+PS C:\Users\Fanta\Documents\C6_MICROSERVICIOS_SPRING_2024\B1_12_ms-products> ./mvnw.cmd clean package -DskipTests
+
+GENERA IMAGEN DE MS-PRODUCTS
+
+docker build -t ms-products:v1 .
+
+LEVANTA CONTENEDOR
+
+{-P} : puerto dinamico
+
+docker run -P --name ms-products-server --network springcloud ms-products:v1
+
+LEVANTAR 2DA INSTANCIA DE PRODUCTOS:
+
+docker run -P --name ms-products-server-2 --network springcloud ms-products:v1
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+SE GENERA JAR DE MS-ITEMS
+
+PS C:\Users\Fanta\Documents\C6_MICROSERVICIOS_SPRING_2024\B1_12_ms-items> ./mvnw.cmd clean package -DskipTests
+
+GENERA IMAGEN DE MS-PRODUCTS
+
+docker build -t ms-items:v1 .
+
+LEVANTA CONTENEDOR ITEMS
+
+docker run -p 8005:8005 --name ms-items-server --network springcloud ms-items:v1
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+SE GENERA JAR DE MS-USERS
+
+PS C:\Users\Fanta\Documents\C6_MICROSERVICIOS_SPRING_2024\B1_12_ms-users> ./mvnw.cmd clean package -DskipTests
+
+GENERA IMAGEN DE MS-USERS
+
+docker build -t ms-users:v1 .
+
+LEVANTA CONTENEDOR USERS
+
+{-P} : puerto dinamico
+
+docker run -P --name ms-users-server --network springcloud ms-users:v1
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+SE GENERA JAR DE MS-OAUTH2
+
+PS C:\Users\Fanta\Documents\C6_MICROSERVICIOS_SPRING_2024\B1_12_ms-oauth2> ./mvnw.cmd clean package -DskipTests
+
+GENERA IMAGEN DE MS-OAUTH2
+
+docker build -t ms-oauth2:v1 .
+
+LEVANTA CONTENEDOR OAUTH2
+
+docker run -p 9100:9100 --name ms-oauth2-server --network springcloud ms-oauth2:v1
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+SE GENERA JAR DE MS-GATEWAY
+
+PS C:\Users\Fanta\Documents\C6_MICROSERVICIOS_SPRING_2024\B1_12_ms-gateway-server_Spring_web_MVC> ./mvnw.cmd clean package -DskipTests
+
+GENERA IMAGEN DE MS-GATEWAY
+
+docker build -t ms-gatewayserver:v1 .
+
+LEVANTA CONTENEDOR GATEWAY
+
+{IP_ADDR} : variable de ambiente q se pone en el application.yml.
+{192.168.1.184} : my ip publica.
+
+docker run -p 8090:8090 --name ms-gateway-server --network springcloud -e IP_ADDR=http://192.168.1.184:9100 ms-gatewayserver:v1
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+

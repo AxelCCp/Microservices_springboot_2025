@@ -1,0 +1,25 @@
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+SE LEVANTAN EUREKA Y CONFIG SERVER. 
+
+PS C:\Users\Fanta\Documents\C6_MICROSERVICIOS_SPRING_2024\B2_12_docker-compose> docker compose up
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+LEVANTAR MAS INSTANCIAS DE CONTENEDORES
+
+
+si no se tiene esto en el docker compose,  en el ms de productos:
+
+deploy: 
+      replicas: 3
+      
+se pueden escalar las replicas con este comando:
+      
+docker-compose up --scale ms-products-server=3
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
